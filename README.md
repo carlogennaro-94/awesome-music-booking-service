@@ -6,7 +6,7 @@ The service exposes REST APIs to create and manage orders, enforcing valid state
 
 ## Stack
 
-- Java 21
+- Java 25
 - Spring Boot 3.5.8
 - Maven
 - Spring Data JPA
