@@ -14,13 +14,12 @@
     </parent>
 
     <groupId>it.carlogennaro</groupId>
-    <artifactId>order-workflow-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>order-workflow-service</name>
-    <description>Service for managing order workflows and state transitions.</description>
-
+<artifactId>awesome-music-booking-service</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+<name>awesome-music-booking-service</name>
+<description>REST API for managing Awesome Music rehearsal room bookings.</description>
     <properties>
-        <java.version>25</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>

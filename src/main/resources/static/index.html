@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Booking Service</title>
+  <style>
+    :root {
+      font-family: Inter, system-ui, sans-serif;
+      color: #18212f;
+      background: #f4f7fb;
+    }
+
+    body {
+      margin: 0;
+      padding: 32px 16px;
+    }
+
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 { margin-bottom: 6px; }
+    .subtitle { color: #5f6b7a; margin-top: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(30, 45, 70, 0.08);
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input, select, button {
+      font: inherit;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    input, select {
+      border: 1px solid #cbd5e1;
+    }
+
+    button {
+      border: 0;
+      background: #2563eb;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #1d4ed8; }
+
+    .message {
+      display: none;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .message.success {
+      display: block;
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .message.error {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .booking-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .booking {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .booking small {
+      display: block;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #fef3c7;
+      color: #92400e;
+      white-space: nowrap;
+    }
+
+    .empty {
+      color: #64748b;
+      margin: 16px 0 0;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Music Booking Service</h1>
+  <p class="subtitle">Gestione richieste di prenotazione sale.</p>
+
+  <div id="message" class="message"></div>
+
+  <section class="grid">
+    <article class="card">
+      <h2>Nuova richiesta</h2>
+
+      <form id="create-booking-form">
+        <label>
+          Sala
+          <input id="roomId" value="ROOM-1" required>
+        </label>
+
+        <label>
+          Cliente
+          <input id="customerName" placeholder="Es. Carlo" required>
+        </label>
+
+        <label>
+          Data
+          <input id="bookingDate" type="date" required>
+        </label>
+
+        <label>
+          Fascia oraria
+          <select id="slot">
+            <option value="MORNING">Mattina</option>
+            <option value="AFTERNOON">Pomeriggio</option>
+            <option value="EVENING">Sera</option>
+          </select>
+        </label>
+
+        <button type="submit">Crea richiesta</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <h2>Gestisci richiesta</h2>
+
+      <form id="update-status-form">
+        <label>
+          Booking code
+          <input id="bookingCode" placeholder="Codice della prenotazione" required>
+        </label>
+
+        <label>
+          Nuovo stato
+          <select id="status">
+            <option value="APPROVED">Approva</option>
+            <option value="REJECTED">Rifiuta</option>
+          </select>
+        </label>
+
+        <button type="submit">Aggiorna stato</button>
+      </form>
+    </article>
+  </section>
+
+  <section class="card" style="margin-top: 20px;">
+    <h2>Richieste in attesa</h2>
+    <button id="refresh-button" type="button">Aggiorna elenco</button>
+    <div id="pending-bookings" class="booking-list"></div>
+  </section>
+</main>
+
+<script>
+  const messageElement = document.getElementById("message");
+  const pendingBookingsElement = document.getElementById("pending-bookings");
+
+  document.getElementById("bookingDate").value =
+    new Date().toISOString().slice(0, 10);
+
+  function showMessage(text, type) {
+    messageElement.textContent = text;
+    messageElement.className = `message ${type}`;
+  }
+
+  async function getErrorMessage(response) {
+    try {
+      const body = await response.json();
+      return body.detail || body.message || "Operazione non riuscita.";
+    } catch {
+      return "Operazione non riuscita.";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  async function loadPendingBookings() {
+    const response = await fetch("/api/bookings/pending");
+
+    if (!response.ok) {
+      showMessage(await getErrorMessage(response), "error");
+      return;
+    }
+
+    const bookings = await response.json();
+
+    if (bookings.length === 0) {
+      pendingBookingsElement.innerHTML =
+        '<p class="empty">Nessuna richiesta in attesa.</p>';
+      return;
+    }
+
+    pendingBookingsElement.innerHTML = bookings.map(booking => `
+      <div class="booking">
+        <div>
+          <strong>${escapeHtml(booking.customerName)}</strong>
+          <small>
+            ${escapeHtml(booking.roomId)} ·
+            ${escapeHtml(booking.bookingDate)} ·
+            ${escapeHtml(booking.slot)}
+          </small>
+          <small>${escapeHtml(booking.bookingCode)}</small>
+        </div>
+        <span class="badge">${escapeHtml(booking.status)}</span>
+      </div>
+    `).join("");
+  }
+
+  document.getElementById("create-booking-form").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const response = await fetch("/api/bookings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        roomId: document.getElementById("roomId").value,
+        customerName: document.getElementById("customerName").value,
+        bookingDate: document.getElementById("bookingDate").value,
+        slot: document.getElementById("slot").value
+      })
+    });
+
+    if (!response.ok) {
+      showMessage(await getErrorMessage(response), "error");
+      return;
+    }
+
+    const booking = await response.json();
+
+    document.getElementById("bookingCode").value = booking.bookingCode;
+    document.getElementById("customerName").value = "";
+
+    showMessage(
+      `Richiesta creata per ${booking.customerName}. Codice: ${booking.bookingCode}`,
+      "success"
+    );
+
+    await loadPendingBookings();
+  });
+
+  document.getElementById("update-status-form").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const bookingCode = document.getElementById("bookingCode").value;
+    const status = document.getElementById("status").value;
+
+    const response = await fetch(`/api/bookings/${bookingCode}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status })
+    });
+
+    if (!response.ok) {
+      showMessage(await getErrorMessage(response), "error");
+      return;
+    }
+
+    const booking = await response.json();
+
+    showMessage(
+      `Prenotazione di ${booking.customerName} aggiornata: ${booking.status}.`,
+      "success"
+    );
+
+    await loadPendingBookings();
+  });
+
+  document.getElementById("refresh-button").addEventListener("click", loadPendingBookings);
+
+  loadPendingBookings();
+</script>
+</body>
+</html>

@@ -22,3 +22,4 @@ The service exposes REST APIs to create and manage orders, enforcing valid state
 
 ```bash
 ./mvnw spring-boot:run
+```
