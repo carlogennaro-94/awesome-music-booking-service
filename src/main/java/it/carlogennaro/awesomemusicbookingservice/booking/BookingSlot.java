@@ -1,4 +1,4 @@
-package it.carlogennaro.orderworkflowservice.booking;
+package it.carlogennaro.awesomemusicbookingservice.booking;
 
 public enum BookingSlot {
     MORNING,

@@ -1,4 +1,4 @@
-package it.carlogennaro.order_workflow_service;
+package it.carlogennaro.awesomemusicbookingservice;
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import it.carlogennaro.orderworkflowservice.OrderWorkflowServiceApplication;
-import it.carlogennaro.orderworkflowservice.booking.Booking;
-import it.carlogennaro.orderworkflowservice.booking.BookingRepository;
-import it.carlogennaro.orderworkflowservice.booking.BookingService;
-import it.carlogennaro.orderworkflowservice.booking.BookingSlot;
-import it.carlogennaro.orderworkflowservice.booking.BookingStatus;
+import it.carlogennaro.awesomemusicbookingservice.AwesomeMusicBookingServiceApplication;
+import it.carlogennaro.awesomemusicbookingservice.booking.Booking;
+import it.carlogennaro.awesomemusicbookingservice.booking.BookingRepository;
+import it.carlogennaro.awesomemusicbookingservice.booking.BookingService;
+import it.carlogennaro.awesomemusicbookingservice.booking.BookingSlot;
+import it.carlogennaro.awesomemusicbookingservice.booking.BookingStatus;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = OrderWorkflowServiceApplication.class)
+@SpringBootTest(classes = AwesomeMusicBookingServiceApplication.class)
 class BookingServiceIntegrationTest {
 
     private static final LocalDate BOOKING_DATE = LocalDate.of(2026, 9, 10);

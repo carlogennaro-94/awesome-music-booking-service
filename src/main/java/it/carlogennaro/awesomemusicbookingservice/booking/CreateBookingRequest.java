@@ -1,4 +1,4 @@
-package it.carlogennaro.orderworkflowservice.booking;
+package it.carlogennaro.awesomemusicbookingservice.booking;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;

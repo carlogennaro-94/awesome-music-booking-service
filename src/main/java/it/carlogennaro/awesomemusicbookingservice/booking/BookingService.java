@@ -1,4 +1,4 @@
-package it.carlogennaro.orderworkflowservice.booking;
+package it.carlogennaro.awesomemusicbookingservice.booking;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

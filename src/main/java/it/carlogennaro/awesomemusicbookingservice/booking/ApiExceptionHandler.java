@@ -1,4 +1,4 @@
-package it.carlogennaro.orderworkflowservice.booking;
+package it.carlogennaro.awesomemusicbookingservice.booking;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

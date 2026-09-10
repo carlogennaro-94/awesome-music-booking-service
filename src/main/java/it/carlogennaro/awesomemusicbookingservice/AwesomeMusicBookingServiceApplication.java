@@ -1,13 +1,13 @@
-package it.carlogennaro.orderworkflowservice;
+package it.carlogennaro.awesomemusicbookingservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class OrderWorkflowServiceApplication {
+public class AwesomeMusicBookingServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OrderWorkflowServiceApplication.class, args);
+		SpringApplication.run(AwesomeMusicBookingServiceApplication.class, args);
 	}
 
 }
